@@ -144,6 +144,30 @@ export default function FahrzeugUebersicht() {
   const [editId, setEditId] = useState(null);
   const [neuPlatzOffen, setNeuPlatzOffen] = useState(false);
   const [meldung, setMeldung] = useState(null);
+  useEffect(() => {
+  async function laden() {
+    const daten = await window.api.ladeFahrzeuge();
+
+    const maxId = Math.max(
+  START_ANZAHL,
+  ...daten.map((f) => f.id)
+);
+
+const plaetze = erzeugeStellplaetze(maxId);
+
+    daten.forEach((f) => {
+      const index = plaetze.findIndex((p) => p.id === f.id);
+
+      if (index !== -1) {
+        plaetze[index] = f;
+      }
+    });
+
+    setStellplaetze(plaetze);
+  }
+
+  laden();
+}, []);
 
   useEffect(() => {
     if (!meldung) return;
@@ -173,23 +197,47 @@ export default function FahrzeugUebersicht() {
     return stellplaetze.find((p) => p.kennzeichen && norm(p.kennzeichen).includes(q)) || "not_found";
   }, [suche, stellplaetze]);
 
-  function aktualisierePlatz(id, patch) {
-    setStellplaetze((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
-  }
+  async function aktualisierePlatz(id, patch) {
+  const fahrzeug = stellplaetze.find((p) => p.id === id);
+  const neu = { ...fahrzeug, ...patch };
+
+  await window.api.speichereFahrzeug(neu);
+
+  setStellplaetze((prev) =>
+    prev.map((p) => (p.id === id ? neu : p))
+  );
+}
 
   function platzLeeren(id) {
     aktualisierePlatz(id, { vin: "", kennzeichen: "", marke: "", eingangsdatum: "", zulassung: "" });
     setMeldung("Stellplatz geräumt");
   }
 
-  function stellplatzHinzufuegen() {
-    setStellplaetze((prev) => {
-      const naechsteId = prev.length ? Math.max(...prev.map((p) => p.id)) + 1 : 1;
-      return [...prev, { id: naechsteId, vin: "", kennzeichen: "", marke: "", eingangsdatum: "", zulassung: "" }];
-    });
-    setNeuPlatzOffen(false);
-    setMeldung("Stellplatz angelegt");
-  }
+  async function stellplatzHinzufuegen() {
+  const naechsteId =
+    stellplaetze.length
+      ? Math.max(...stellplaetze.map((p) => p.id)) + 1
+      : 1;
+
+  const neuerPlatz = {
+    id: naechsteId,
+    vin: "",
+    kennzeichen: "",
+    marke: "",
+    eingangsdatum: "",
+    zulassung: "",
+    foto: "",
+  };
+
+  // In SQLite speichern
+  await window.api.speichereFahrzeug(neuerPlatz);
+
+  // In React anzeigen
+  setStellplaetze((prev) => [...prev, neuerPlatz]);
+
+  setNeuPlatzOffen(false);
+  setMeldung("Stellplatz angelegt");
+}
 
   function stellplatzEntfernen(id) {
     setStellplaetze((prev) => prev.filter((p) => p.id !== id));
