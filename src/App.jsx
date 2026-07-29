@@ -1,3 +1,4 @@
+import { MARKEN } from "./automarken";
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import {
   LayoutGrid,
@@ -21,14 +22,6 @@ import {
    Fahrzeugübersicht — Fuhrpark-Verwaltung
    Seitenleiste + Hell/Dunkel-Modus, ruhige Fachanwendungs-Optik.
 --------------------------------------------------------- */
-
-const MARKEN = [
-  "Audi", "BMW", "Mercedes-Benz", "Volkswagen", "Volvo", "Toyota", "Ford",
-  "Opel", "Mazda", "Nissan", "Hyundai", "Kia", "Renault", "Peugeot",
-  "Citroën", "Porsche", "Mini", "Mitsubishi", "Dacia", "Suzuki", "Skoda",
-  "Seat", "Cupra", "Subaru", "Fiat", "Alfa Romeo", "Land Rover", "Jeep",
-  "Sonstige",
-];
 
 const SCHWELLE_GELB = 14;
 const SCHWELLE_ORANGE = 21;
