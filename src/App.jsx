@@ -1,3 +1,5 @@
+import BenzinImBlutKachel from "./BenzinImBlutKachel";
+import Select from "react-select";
 import { MARKEN } from "./automarken";
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import {
@@ -249,7 +251,7 @@ const plaetze = erzeugeStellplaetze(maxId);
       <div className="flex-1 min-w-0 flex flex-col">
         <TopBar t={t} suche={suche} setSuche={setSuche} gefundenerPlatz={gefundenerPlatz} />
 
-        <main className="flex-1 px-7 py-6 max-w-[1400px] w-full mx-auto">
+        <main className="flex-1 px-7 py-6 max-w-[1650px] w-full mx-auto">
           {ansicht === "dashboard" && (
             <Dashboard
               ctx={ctx}
@@ -463,8 +465,8 @@ function Dashboard({ ctx, stellplaetze, belegte, freie, auslastungProzent, stand
   const gruen = { hell: "#0F7A50", dunkel: "#6FDCAE" }[ctx.modus];
 
   return (
-    <div className="space-y-6">
-      <div>
+    <div className="space-y-4">
+      <div className="mb-1">
         <h1 className="text-[20px] font-semibold tracking-tight">Übersicht</h1>
         <p className="text-[13px] mt-0.5" style={{ color: t.textMuted }}>Stand: {formatDatum(heuteISO())}</p>
       </div>
@@ -485,51 +487,106 @@ function Dashboard({ ctx, stellplaetze, belegte, freie, auslastungProzent, stand
       </div>
 
       <div className="grid grid-cols-3 gap-4">
-        <div className="rounded-xl p-5 border" style={{ background: t.panel, borderColor: t.border }}>
-          <div className="text-[13px] font-medium mb-4" style={{ color: t.textMuted }}>Auslastung</div>
-          <div className="flex items-center justify-center py-2">
-            <RingChart t={t} prozent={auslastungProzent} />
-          </div>
-          <div className="flex justify-between text-[12px] mt-3 pt-3 border-t" style={{ color: t.textMuted, borderColor: t.borderSoft }}>
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full inline-block" style={{ background: t.text }} /> Belegt {belegte.length}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full inline-block" style={{ background: t.ringTrack }} /> Frei {freie.length}
-            </span>
-          </div>
-        </div>
+  <div className="rounded-xl p-4 border" style={{ background: t.panel, borderColor: t.border }}>
+    <div className="text-[13px] font-medium mb-4" style={{ color: t.textMuted }}>
+      Auslastung
+    </div>
 
-        <div className="rounded-xl p-5 border" style={{ background: t.panel, borderColor: t.border }}>
-          <div className="text-[13px] font-medium mb-4" style={{ color: t.textMuted }}>Standzeit-Ampel</div>
-          <div className="space-y-3">
-            <StandzeitBalken t={t} c={stufenFarben.gelb} label={`14–${SCHWELLE_ORANGE - 1} Tage`} wert={standzeitStats.gelb} max={belegte.length} />
-            <StandzeitBalken t={t} c={stufenFarben.orange} label={`${SCHWELLE_ORANGE}–${SCHWELLE_ROT - 1} Tage`} wert={standzeitStats.orange} max={belegte.length} />
-            <StandzeitBalken t={t} c={stufenFarben.rot} label={`${SCHWELLE_ROT}+ Tage`} wert={standzeitStats.rot} max={belegte.length} />
-          </div>
-          {kritische === 0 && (
-            <p className="text-[12px] mt-4 pt-3 border-t" style={{ color: t.textFaint, borderColor: t.borderSoft }}>
-              Keine kritischen Standzeiten.
-            </p>
-          )}
-        </div>
+    <div className="flex items-center justify-center py-1">
+      <RingChart t={t} prozent={auslastungProzent} />
+    </div>
 
-        <div className="rounded-xl p-5 border" style={{ background: t.panel, borderColor: t.border }}>
-          <div className="text-[13px] font-medium mb-4" style={{ color: t.textMuted }}>Zuletzt eingegangen</div>
-          {kuerzlich.length === 0 && <p className="text-[12px]" style={{ color: t.textFaint }}>Noch keine Fahrzeuge erfasst.</p>}
-          <div className="space-y-2.5">
-            {kuerzlich.map((p) => (
-              <div key={p.id} className="flex items-center justify-between text-[12.5px]">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-mono font-medium truncate">{p.kennzeichen}</span>
-                  <span className="truncate" style={{ color: t.textFaint }}>{p.marke}</span>
-                </div>
-                <span className="shrink-0 ml-2" style={{ color: t.textFaint }}>{formatDatum(p.eingangsdatum)}</span>
-              </div>
-            ))}
+    <div
+      className="flex justify-between text-[12px] mt-3 pt-3 border-t"
+      style={{ color: t.textMuted, borderColor: t.borderSoft }}
+    >
+      <span className="flex items-center gap-1.5">
+        <span className="w-2 h-2 rounded-full inline-block" style={{ background: t.text }} />
+        Belegt {belegte.length}
+      </span>
+
+      <span className="flex items-center gap-1.5">
+        <span className="w-2 h-2 rounded-full inline-block" style={{ background: t.ringTrack }} />
+        Frei {freie.length}
+      </span>
+    </div>
+  </div>
+
+  <div className="rounded-xl p-4 border" style={{ background: t.panel, borderColor: t.border }}>
+    <div className="text-[13px] font-medium mb-4" style={{ color: t.textMuted }}>
+      Standzeit-Ampel
+    </div>
+
+    <div className="space-y-3">
+      <StandzeitBalken
+        t={t}
+        c={stufenFarben.gelb}
+        label={`14–${SCHWELLE_ORANGE - 1} Tage`}
+        wert={standzeitStats.gelb}
+        max={belegte.length}
+      />
+
+      <StandzeitBalken
+        t={t}
+        c={stufenFarben.orange}
+        label={`${SCHWELLE_ORANGE}–${SCHWELLE_ROT - 1} Tage`}
+        wert={standzeitStats.orange}
+        max={belegte.length}
+      />
+
+      <StandzeitBalken
+        t={t}
+        c={stufenFarben.rot}
+        label={`${SCHWELLE_ROT}+ Tage`}
+        wert={standzeitStats.rot}
+        max={belegte.length}
+      />
+    </div>
+
+    {kritische === 0 && (
+      <p
+        className="text-[12px] mt-4 pt-3 border-t"
+        style={{ color: t.textFaint, borderColor: t.borderSoft }}
+      >
+        Keine kritischen Standzeiten.
+      </p>
+    )}
+  </div>
+
+  <div className="rounded-xl p-4 border" style={{ background: t.panel, borderColor: t.border }}>
+    <div className="text-[13px] font-medium mb-4" style={{ color: t.textMuted }}>
+      Zuletzt eingegangen
+    </div>
+
+    {kuerzlich.length === 0 && (
+      <p className="text-[12px]" style={{ color: t.textFaint }}>
+        Noch keine Fahrzeuge erfasst.
+      </p>
+    )}
+
+    <div className="space-y-2.5">
+      {kuerzlich.map((p) => (
+        <div key={p.id} className="flex items-center justify-between text-[12.5px]">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="font-mono font-medium truncate">{p.kennzeichen}</span>
+            <span className="truncate" style={{ color: t.textFaint }}>
+              {p.marke}
+            </span>
           </div>
+
+          <span className="shrink-0 ml-2" style={{ color: t.textFaint }}>
+            {formatDatum(p.eingangsdatum)}
+          </span>
         </div>
-      </div>
+      ))}
+    </div>
+  </div>
+
+  <div className="col-span-3">
+    <BenzinImBlutKachel t={t} />
+  </div>
+
+</div>
 
       {kritischeListe.length > 0 && (
         <div className="rounded-xl overflow-hidden border" style={{ background: t.panel, borderColor: t.border }}>
@@ -884,15 +941,22 @@ function BearbeitenModal({ ctx, platz, onClose, onSave, onLeeren, onLoeschen }) 
             </Feld>
 
             <Feld t={t} label="Marke">
-              <select
-                value={form.marke}
-                onChange={(e) => setFeld("marke", e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 text-[13px] outline-none"
-                style={inputStyle}
-              >
-                <option value="">— auswählen —</option>
-                {MARKEN.map((m) => <option key={m} value={m}>{m}</option>)}
-              </select>
+              <Select
+  options={MARKEN.map((m) => ({
+    value: m,
+    label: m,
+  }))}
+  value={
+    form.marke
+      ? { value: form.marke, label: form.marke }
+      : null
+  }
+  onChange={(option) =>
+    setFeld("marke", option ? option.value : "")
+  }
+  placeholder="Marke auswählen..."
+  isClearable
+/>
             </Feld>
 
             <div className="grid grid-cols-2 gap-3">
