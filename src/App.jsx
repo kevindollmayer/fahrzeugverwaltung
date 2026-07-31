@@ -1,3 +1,4 @@
+import logo from "./assets/lb-logo.png";
 import BenzinImBlutKachel from "./BenzinImBlutKachel";
 import Select from "react-select";
 import { MARKEN } from "./automarken";
@@ -18,6 +19,7 @@ import {
   Sun,
   Moon,
   Table2,
+  Settings,
 } from "lucide-react";
 
 /* ---------------------------------------------------------
@@ -186,11 +188,18 @@ const plaetze = erzeugeStellplaetze(maxId);
   const auslastungProzent = stellplaetze.length ? Math.round((belegte.length / stellplaetze.length) * 100) : 0;
 
   const gefundenerPlatz = useMemo(() => {
-    if (!suche.trim()) return null;
-    const norm = (s) => s.toLowerCase().replace(/[\s-]/g, "");
-    const q = norm(suche);
-    return stellplaetze.find((p) => p.kennzeichen && norm(p.kennzeichen).includes(q)) || "not_found";
-  }, [suche, stellplaetze]);
+  if (!suche.trim()) return null;
+
+  const norm = (s) => (s || "").toLowerCase().replace(/[\s-]/g, "");
+  const q = norm(suche);
+
+  return (
+    stellplaetze.find((p) =>
+      norm(p.kennzeichen).includes(q) ||
+      norm(p.vin).includes(q)
+    ) || "not_found"
+  );
+}, [suche, stellplaetze]);
 
   async function aktualisierePlatz(id, patch) {
   const fahrzeug = stellplaetze.find((p) => p.id === id);
@@ -291,6 +300,123 @@ const plaetze = erzeugeStellplaetze(maxId);
               platzLeeren={platzLeeren}
             />
           )}
+          {ansicht === "einstellungen" && (
+  <div className="space-y-4">
+    <div className="mb-1">
+      <h1 className="text-[20px] font-semibold tracking-tight">
+        ⚙️ Einstellungen
+      </h1>
+      <p
+        className="text-[13px] mt-0.5"
+        style={{ color: t.textMuted }}
+      >
+        Allgemeine Einstellungen der Anwendung
+      </p>
+    </div>
+<div
+  className="rounded-xl p-4 border"
+  style={{
+    background: t.panel,
+    borderColor: t.border,
+  }}
+>
+  <div
+    className="text-[13px] font-medium mb-4"
+    style={{ color: t.textMuted }}
+  >
+    Darstellung
+  </div>
+
+  <button
+    onClick={() =>
+      setModus(modus === "hell" ? "dunkel" : "hell")
+    }
+    className="h-10 px-4 rounded-lg border text-sm font-medium transition-all hover:shadow-sm hover:-translate-y-0.5"
+    style={{
+      borderColor: t.border,
+      background: t.panel,
+      color: t.text,
+    }}
+  >
+    {modus === "hell"
+      ? "🌙 Dunkelmodus aktivieren"
+      : "☀️ Hellmodus aktivieren"}
+  </button>
+</div>
+    <div
+      className="rounded-xl p-4 border"
+      style={{
+        background: t.panel,
+        borderColor: t.border,
+      }}
+    >
+      <div
+        className="text-[13px] font-medium mb-4"
+        style={{ color: t.textMuted }}
+      >
+        Datenbank
+      </div>
+
+     <div className="flex gap-3 flex-wrap">
+  <button
+  onClick={async () => {
+    const result = await window.api.backupDatenbank();
+
+    if (result?.success) {
+      alert(result.message);
+    }
+  }}
+    className="h-10 px-4 rounded-lg border text-sm font-medium transition-all hover:shadow-sm hover:-translate-y-0.5"
+    style={{
+      borderColor: t.border,
+      background: t.panel,
+      color: t.text,
+    }}
+  >
+    💾 Datenbank sichern
+  </button>
+
+  <button
+  onClick={async () => {
+    const result = await window.api.wiederherstellenDatenbank();
+
+    if (result?.success) {
+      alert(result.message);
+      window.location.reload();
+    }
+  }}
+    className="h-10 px-4 rounded-lg border text-sm font-medium transition-all hover:shadow-sm hover:-translate-y-0.5"
+    style={{
+      borderColor: t.border,
+      background: t.panel,
+      color: t.text,
+    }}
+  >
+    📂 Datenbank wiederherstellen
+  </button>
+</div>
+    </div>
+
+    <div
+      className="rounded-xl p-4 border"
+      style={{
+        background: t.panel,
+        borderColor: t.border,
+      }}
+    >
+      <div
+        className="text-[13px] font-medium mb-4"
+        style={{ color: t.textMuted }}
+      >
+        Informationen
+      </div>
+
+      <p style={{ color: t.text }}>
+        Version 1.0
+      </p>
+    </div>
+  </div>
+)}
         </main>
       </div>
 
@@ -315,27 +441,39 @@ const plaetze = erzeugeStellplaetze(maxId);
 /* ---------------- Seitenleiste ---------------- */
 
 function Sidebar({ t, ansicht, setAnsicht, modus, setModus }) {
-  const items = [
-    { key: "dashboard", label: "Dashboard", icon: LayoutGrid },
-    { key: "plan", label: "Stellplatzplan", icon: ParkingSquare },
-    { key: "liste", label: "Fahrzeuge", icon: Table2 },
-  ];
+ const items = [
+  { key: "dashboard", label: "Dashboard", icon: LayoutGrid },
+  { key: "plan", label: "Stellplatzplan", icon: ParkingSquare },
+  { key: "liste", label: "Fahrzeuge", icon: Table2 },
+  { key: "einstellungen", label: "Einstellungen", icon: Settings },
+]; 
   return (
     <aside
       className="w-60 shrink-0 flex flex-col justify-between py-5"
       style={{ background: t.sidebarBg, color: t.sidebarText }}
     >
       <div>
-        <div className="flex items-center gap-2.5 px-5 mb-7">
-          <div className="w-8 h-8 rounded-md flex items-center justify-center shrink-0" style={{ background: t.accent }}>
-            <Car size={16} style={{ color: t.accentText }} />
-          </div>
-          <div className="leading-tight">
-            <div className="font-semibold text-[14px] tracking-tight" style={{ color: t.sidebarTextActive }}>
-              Fahrzeugübersicht
-            </div>
-            <div className="text-[11px]" style={{ color: t.textFaint }}>Fuhrparkverwaltung</div>
-          </div>
+        <div className="flex flex-col items-center px-5 mb-7">
+          
+          <div
+  className="flex flex-col items-center pt-4 pb-5"
+  style={{ width: "220px" }}
+>
+
+  <div
+    className="mt-3 font-bold text-[18px] text-center tracking-tight"
+    style={{ color: t.sidebarTextActive }}
+  >
+    Fahrzeugübersicht
+  </div>
+
+  <div
+    className="text-[13px] text-center"
+    style={{ color: t.textFaint }}
+  >
+    Fuhrparkverwaltung
+  </div>
+</div>
         </div>
 
         <nav className="px-3 space-y-0.5">
@@ -395,7 +533,7 @@ function TopBar({ t, suche, setSuche, gefundenerPlatz }) {
         <input
           value={suche}
           onChange={(e) => setSuche(e.target.value)}
-          placeholder="Kennzeichen suchen…"
+          placeholder="Kennzeichen oder VIN suchen…"
           className="w-full rounded-lg pl-9 pr-3 py-2 text-[13px] outline-none transition-colors border"
           style={{ background: t.inputBg, color: t.text, borderColor: "transparent", fontFamily: "ui-monospace, monospace" }}
         />
@@ -408,10 +546,27 @@ function TopBar({ t, suche, setSuche, gefundenerPlatz }) {
               <span style={{ color: t.textMuted }}>Kein Fahrzeug mit diesem Kennzeichen gefunden.</span>
             )}
             {gefundenerPlatz && gefundenerPlatz !== "not_found" && (
-              <span style={{ color: t.text }}>
-                <span className="font-mono font-semibold">{gefundenerPlatz.kennzeichen}</span> steht auf{" "}
-                <span className="font-semibold">Stellplatz {gefundenerPlatz.id}</span> ({gefundenerPlatz.marke || "Marke unbekannt"})
-              </span>
+              <div style={{ color: t.text }}>
+  <div>
+    <span className="font-mono font-semibold">
+      {gefundenerPlatz.kennzeichen}
+    </span>{" "}
+    steht auf{" "}
+    <span className="font-semibold">
+      Stellplatz {gefundenerPlatz.id}
+    </span>{" "}
+    ({gefundenerPlatz.marke || "Marke unbekannt"})
+  </div>
+
+  {gefundenerPlatz.vin && (
+    <div
+      className="mt-1 text-[12px] font-mono"
+      style={{ color: t.textMuted }}
+    >
+      VIN: {gefundenerPlatz.vin}
+    </div>
+  )}
+</div>
             )}
           </div>
         )}
@@ -588,38 +743,6 @@ function Dashboard({ ctx, stellplaetze, belegte, freie, auslastungProzent, stand
 
 </div>
 
-      {kritischeListe.length > 0 && (
-        <div className="rounded-xl overflow-hidden border" style={{ background: t.panel, borderColor: t.border }}>
-          <div className="px-5 py-3.5 border-b flex items-center gap-2" style={{ borderColor: t.borderSoft }}>
-            <AlertTriangle size={15} style={{ color: stufenFarben.gelb.dot }} />
-            <span className="text-[13px] font-medium" style={{ color: t.textMuted }}>Fahrzeuge mit langer Standzeit</span>
-          </div>
-          <table className="w-full text-[13px]">
-            <tbody>
-              {kritischeListe.map((p) => {
-                const stufe = standzeitStufe(p.tage);
-                const c = stufenFarben[stufe];
-                return (
-                  <tr key={p.id} className="border-b last:border-0" style={{ borderColor: t.borderSoft }}>
-                    <td className="px-5 py-2.5 w-20" style={{ color: t.textFaint }}>Platz {p.id}</td>
-                    <td className="px-5 py-2.5 font-mono font-medium">{p.kennzeichen}</td>
-                    <td className="px-5 py-2.5" style={{ color: t.textMuted }}>{p.marke}</td>
-                    <td className="px-5 py-2.5" style={{ color: t.textMuted }}>seit {formatDatum(p.eingangsdatum)}</td>
-                    <td className="px-5 py-2.5 text-right">
-                      <span
-                        className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[12px] font-medium"
-                        style={{ background: c.bg, color: c.text }}
-                      >
-                        <Clock size={11} /> {p.tage} Tage
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
     </div>
   );
 }
@@ -800,19 +923,84 @@ function ListeAnsicht({ ctx, stellplaetze, editId, setEditId, aktualisierePlatz,
 
       <div className="rounded-xl overflow-hidden border" style={{ background: t.panel, borderColor: t.border }}>
         <table className="w-full text-[13px]">
-          <thead>
-            <tr className="border-b" style={{ borderColor: t.border, background: t.panelAlt }}>
-              <Th t={t} onClick={() => setSortNach("id")} active={sortNach === "id"}>Platz</Th>
-              <th className="text-left px-4 py-2.5 font-medium" style={{ color: t.textMuted }}>Status</th>
-              <Th t={t} onClick={() => setSortNach("kennzeichen")} active={sortNach === "kennzeichen"}>Kennzeichen</Th>
-              <th className="text-left px-4 py-2.5 font-medium" style={{ color: t.textMuted }}>VIN</th>
-              <Th t={t} onClick={() => setSortNach("marke")} active={sortNach === "marke"}>Marke</Th>
-              <th className="text-left px-4 py-2.5 font-medium" style={{ color: t.textMuted }}>Eingangsdatum</th>
-              <th className="text-left px-4 py-2.5 font-medium" style={{ color: t.textMuted }}>Kfz-Zulassung</th>
-              <Th t={t} onClick={() => setSortNach("standzeit")} active={sortNach === "standzeit"}>Standzeit</Th>
-              <th className="px-4 py-2.5"></th>
-            </tr>
-          </thead>
+       <thead>
+  <tr
+    className="border-b"
+    style={{ borderColor: t.border, background: t.panelAlt }}
+  >
+    <Th t={t} onClick={() => setSortNach("id")} active={sortNach === "id"}>
+      Platz
+    </Th>
+
+    <th
+      className="text-left px-4 py-2.5 font-medium"
+      style={{ color: t.textMuted }}
+    >
+      Status
+    </th>
+
+    <Th
+      t={t}
+      onClick={() => setSortNach("kennzeichen")}
+      active={sortNach === "kennzeichen"}
+    >
+      Kennzeichen
+    </Th>
+
+    <th
+      className="text-left px-4 py-2.5 font-medium"
+      style={{ color: t.textMuted }}
+    >
+      VIN
+    </th>
+
+    <Th
+      t={t}
+      onClick={() => setSortNach("marke")}
+      active={sortNach === "marke"}
+    >
+      Marke
+    </Th>
+
+    <th
+      className="text-left px-4 py-2.5 font-medium"
+      style={{ color: t.textMuted }}
+    >
+      Eingangsdatum
+    </th>
+
+    <th
+      className="text-left px-4 py-2.5 font-medium"
+      style={{ color: t.textMuted }}
+    >
+      Zugelassen
+    </th>
+
+    <th
+      className="text-left px-4 py-2.5 font-medium"
+      style={{ color: t.textMuted }}
+    >
+      HU/AU
+    </th>
+
+    <th
+      className="text-left px-4 py-2.5 font-medium"
+      style={{ color: t.textMuted }}
+    >
+      Bereifung
+    </th>
+
+    <Th
+      t={t}
+      onClick={() => setSortNach("standzeit")}
+      active={sortNach === "standzeit"}
+    >
+      Standzeit
+    </Th>
+
+    <th className="px-4 py-2.5"></th>
+  </tr>
+</thead>
           <tbody>
             {gefiltert.map((p) => {
               const belegt = !!p.kennzeichen;
@@ -833,7 +1021,33 @@ function ListeAnsicht({ ctx, stellplaetze, editId, setEditId, aktualisierePlatz,
                   <td className="px-4 py-2.5 font-mono text-[12px]" style={{ color: t.textMuted }}>{p.vin || "—"}</td>
                   <td className="px-4 py-2.5" style={{ color: t.text }}>{p.marke || "—"}</td>
                   <td className="px-4 py-2.5" style={{ color: t.textMuted }}>{formatDatum(p.eingangsdatum)}</td>
-                  <td className="px-4 py-2.5" style={{ color: t.textMuted }}>{formatDatum(p.zulassung)}</td>
+                  <td className="px-4 py-2.5">
+  <span
+    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11.5px] font-medium"
+    style={{
+      background: p.zugelassen === "Ja" ? "#DCFCE7" : "#FEE2E2",
+      color: p.zugelassen === "Ja" ? "#166534" : "#991B1B",
+    }}
+  >
+    {p.zugelassen === "Ja" ? "🟢 Ja" : "🔴 Nein"}
+  </span>
+</td>
+
+<td className="px-4 py-2.5">
+  <span
+    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11.5px] font-medium"
+    style={{
+      background: p.hu_au === "Gültig" ? "#DCFCE7" : "#FEE2E2",
+      color: p.hu_au === "Gültig" ? "#166534" : "#991B1B",
+    }}
+  >
+    {p.hu_au === "Gültig" ? "🟢 Gültig" : "🔴 Abgelaufen"}
+  </span>
+</td>
+
+<td className="px-4 py-2.5" style={{ color: t.text }}>
+  {p.bereifung || "—"}
+</td>
                   <td className="px-4 py-2.5">
                     {belegt && tage !== null ? (
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11.5px] font-medium" style={{ background: c.bg, color: c.text }}>
@@ -853,7 +1067,7 @@ function ListeAnsicht({ ctx, stellplaetze, editId, setEditId, aktualisierePlatz,
             })}
             {gefiltert.length === 0 && (
               <tr>
-                <td colSpan={9} className="px-4 py-10 text-center text-[13px]" style={{ color: t.textFaint }}>
+                <td colSpan={11} className="px-4 py-10 text-center text-[13px]" style={{ color: t.textFaint }}>
                   Keine Stellplätze in dieser Ansicht.
                 </td>
               </tr>
@@ -959,14 +1173,75 @@ function BearbeitenModal({ ctx, platz, onClose, onSave, onLeeren, onLoeschen }) 
 />
             </Feld>
 
-            <div className="grid grid-cols-2 gap-3">
-              <Feld t={t} label="Eingangsdatum">
-                <input type="date" value={form.eingangsdatum} onChange={(e) => setFeld("eingangsdatum", e.target.value)} className="w-full border rounded-lg px-3 py-2 text-[13px] outline-none" style={inputStyle} />
-              </Feld>
-              <Feld t={t} label="Kfz-Zulassung">
-                <input type="date" value={form.zulassung} onChange={(e) => setFeld("zulassung", e.target.value)} className="w-full border rounded-lg px-3 py-2 text-[13px] outline-none" style={inputStyle} />
-              </Feld>
-            </div>
+            <Feld t={t} label="Eingangsdatum">
+  <input
+    type="date"
+    value={form.eingangsdatum}
+    onChange={(e) => setFeld("eingangsdatum", e.target.value)}
+    className="w-full border rounded-lg px-3 py-2 text-[13px] outline-none"
+    style={inputStyle}
+  />
+</Feld>
+
+<Feld t={t} label="Kfz-Zulassung">
+  <div className="flex gap-2">
+    {["Ja", "Nein"].map((wert) => (
+      <button
+        key={wert}
+        type="button"
+        onClick={() => setFeld("zugelassen", wert)}
+        className="flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-all hover:shadow-sm hover:-translate-y-0.5"
+        style={{
+          background: form.zugelassen === wert ? t.accent : t.panel,
+          color: form.zugelassen === wert ? t.accentText : t.text,
+          borderColor: form.zugelassen === wert ? t.accent : t.border,
+        }}
+      >
+        {wert}
+      </button>
+    ))}
+  </div>
+</Feld>
+
+<Feld t={t} label="HU / AU">
+  <div className="flex gap-2">
+    {["Gültig", "Abgelaufen"].map((wert) => (
+      <button
+        key={wert}
+        type="button"
+        onClick={() => setFeld("hu_au", wert)}
+        className="flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-all hover:shadow-sm hover:-translate-y-0.5"
+        style={{
+          background: form.hu_au === wert ? t.accent : t.panel,
+          color: form.hu_au === wert ? t.accentText : t.text,
+          borderColor: form.hu_au === wert ? t.accent : t.border,
+        }}
+      >
+        {wert}
+    </button>
+    ))}
+  </div>
+</Feld>
+
+<Feld t={t} label="Bereifung">
+  <div className="flex gap-2">
+    {["Sommer", "Winter", "Allwetter"].map((wert) => (
+      <button
+        key={wert}
+        type="button"
+        onClick={() => setFeld("bereifung", wert)}
+        className="flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-all hover:shadow-sm hover:-translate-y-0.5"
+        style={{
+          background: form.bereifung === wert ? t.accent : t.panel,
+          color: form.bereifung === wert ? t.accentText : t.text,
+          borderColor: form.bereifung === wert ? t.accent : t.border,
+        }}
+      >
+        {wert}
+      </button>
+    ))}
+  </div>
+</Feld>
 
             <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: t.borderSoft }}>
               <div className="flex items-center gap-3">

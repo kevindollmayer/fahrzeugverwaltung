@@ -13,7 +13,9 @@ CREATE TABLE IF NOT EXISTS fahrzeuge (
     vin TEXT,
     marke TEXT,
     eingangsdatum TEXT,
-    zulassung TEXT
+    zugelassen TEXT,
+    hu_au TEXT,
+    bereifung TEXT
 );
 `);
 try {
@@ -24,5 +26,30 @@ try {
 } catch {
   // Spalte existiert bereits
 }
+try {
+  db.exec(`
+    ALTER TABLE fahrzeuge
+    ADD COLUMN zugelassen TEXT;
+  `);
+} catch {
+  // Spalte existiert bereits
+}
 
+try {
+  db.exec(`
+    ALTER TABLE fahrzeuge
+    ADD COLUMN hu_au TEXT;
+  `);
+} catch {
+  // Spalte existiert bereits
+}
+
+try {
+  db.exec(`
+    ALTER TABLE fahrzeuge
+    ADD COLUMN bereifung TEXT;
+  `);
+} catch {
+  // Spalte existiert bereits
+}
 export default db;

@@ -32,12 +32,25 @@ export default function BenzinImBlutKachel({ t }) {
       }}
     >
       <div>
-        <h3
-          className="text-[15px] font-semibold mb-4"
-          style={{ color: t.textMuted }}
-        >
-          ⛽ Benzin im Blut
-        </h3>
+        <div
+  className="text-[24px] font-black text-center tracking-tight"
+  style={{
+    color: t.text,
+    fontFamily: "Inter, Poppins, ui-sans-serif, sans-serif",
+  }}
+>
+  ⛽ BL Fakt des Tages
+</div>
+
+<div
+  className="mt-2 mb-6 text-[14px] text-center"
+  style={{
+    color: t.textMuted,
+    fontFamily: "Inter, Poppins, ui-sans-serif, sans-serif",
+  }}
+>
+  Heute schon was gelernt?
+</div>
 
         <div
           style={{
