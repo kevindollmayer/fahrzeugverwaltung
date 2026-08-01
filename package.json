@@ -9,7 +9,7 @@
   "main": "electron.js",
   "scripts": {
     "dev": "vite",
-    "electron": "electron electron.js",
+    "electron": ".\\node_modules\\.bin\\electron.cmd electron.js",
     "dev:electron": "concurrently \"npm run dev\" \"npm run electron\"",
     "build": "vite build",
     "dist": "electron-builder",
@@ -49,20 +49,20 @@
       "package.json"
     ],
     "asar": true,
-
-"artifactName": "Fahrzeugverwaltung_Setup_${version}.${ext}",
-
-"win": {
-  "target": "nsis",
-  "icon": "icon.ico"
-},
-
-"nsis": {
-  "oneClick": false,
-  "allowToChangeInstallationDirectory": true,
-  "createDesktopShortcut": true,
-  "createStartMenuShortcut": true,
-  "shortcutName": "Fahrzeugverwaltung"
-}
+    "artifactName": "Fahrzeugverwaltung_Setup_${version}.${ext}",
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Fahrzeugverwaltung"
+    }
+  },
+  "allowScripts": {
+    "better-sqlite3@13.0.2": true
   }
 }
