@@ -1,7 +1,10 @@
 {
   "name": "fahrzeugverwaltung",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.1.0",
+  "description": "Professionelle Fahrzeugverwaltung für Stellplatz- und Fuhrparkmanagement",
+  "author": "Kevin Dollmayer",
+  "license": "Copyright © Kevin Dollmayer",
   "type": "module",
   "main": "electron.js",
   "scripts": {
@@ -46,8 +49,20 @@
       "package.json"
     ],
     "asar": true,
-    "win": {
-      "target": "nsis"
-    }
+
+"artifactName": "Fahrzeugverwaltung_Setup_${version}.${ext}",
+
+"win": {
+  "target": "nsis",
+  "icon": "icon.ico"
+},
+
+"nsis": {
+  "oneClick": false,
+  "allowToChangeInstallationDirectory": true,
+  "createDesktopShortcut": true,
+  "createStartMenuShortcut": true,
+  "shortcutName": "Fahrzeugverwaltung"
+}
   }
 }
