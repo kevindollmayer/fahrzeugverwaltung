@@ -213,9 +213,21 @@ const plaetze = erzeugeStellplaetze(maxId);
 }
 
   function platzLeeren(id) {
-    aktualisierePlatz(id, { vin: "", kennzeichen: "", marke: "", eingangsdatum: "", zulassung: "" });
-    setMeldung("Stellplatz geräumt");
-  }
+  aktualisierePlatz(id, {
+    vin: "",
+    kennzeichen: "",
+    marke: "",
+    eingangsdatum: "",
+    zugelassen: "",
+    hu_au: "",
+    bereifung: "",
+    schluessel: 0,
+    notizen: "",
+    foto: ""
+  });
+
+  setMeldung("Stellplatz geräumt");
+}
 
   async function stellplatzHinzufuegen() {
   const naechsteId =
@@ -851,7 +863,13 @@ function StellplatzKachel({ ctx, platz, onClick }) {
     >
       <div className="flex items-center justify-between mb-2">
         <span className="text-[11px] font-medium" style={{ color: t.textFaint }}>#{platz.id}</span>
-        <span className="w-2 h-2 rounded-full" style={{ background: belegt ? c.dot : t.ringTrack }} title={belegt ? `${tage} Tage Standzeit` : "Frei"} />
+        <span
+  className="w-2 h-2 rounded-full"
+  style={{
+    background: belegt ? "#DC2626" : "#16A34A"
+  }}
+  title={belegt ? `${tage} Tage Standzeit` : "Frei"}
+/>
       </div>
       {belegt ? (
         <div>
@@ -1012,41 +1030,58 @@ function ListeAnsicht({ ctx, stellplaetze, editId, setEditId, aktualisierePlatz,
                 <tr key={p.id} className="border-b last:border-0 transition-colors" style={{ borderColor: t.borderSoft }}>
                   <td className="px-4 py-2.5" style={{ color: t.textFaint }}>{p.id}</td>
                   <td className="px-4 py-2.5">
-                    <span className="inline-flex items-center gap-1.5 text-[12px] font-medium" style={{ color: belegt ? t.textMuted : gruen }}>
-                      <span className="w-1.5 h-1.5 rounded-full" style={{ background: belegt ? t.textFaint : gruen }} />
-                      {belegt ? "Belegt" : "Frei"}
-                    </span>
+                    <span
+  className="inline-flex items-center gap-1.5 text-[12px] font-medium"
+  style={{
+    color: belegt ? "#DC2626" : "#16A34A"
+  }}
+>
+  <span
+    className="w-1.5 h-1.5 rounded-full"
+    style={{
+      background: belegt ? "#DC2626" : "#16A34A"
+    }}
+  />
+  {belegt ? "Belegt" : "Frei"}
+</span>
                   </td>
                   <td className="px-4 py-2.5 font-mono font-medium">{p.kennzeichen || "—"}</td>
                   <td className="px-4 py-2.5 font-mono text-[12px]" style={{ color: t.textMuted }}>{p.vin || "—"}</td>
                   <td className="px-4 py-2.5" style={{ color: t.text }}>{p.marke || "—"}</td>
                   <td className="px-4 py-2.5" style={{ color: t.textMuted }}>{formatDatum(p.eingangsdatum)}</td>
                   <td className="px-4 py-2.5">
-  <span
-    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11.5px] font-medium"
-    style={{
-      background: p.zugelassen === "Ja" ? "#DCFCE7" : "#FEE2E2",
-      color: p.zugelassen === "Ja" ? "#166534" : "#991B1B",
-    }}
-  >
-    {p.zugelassen === "Ja" ? "🟢 Ja" : "🔴 Nein"}
-  </span>
+  {!p.kennzeichen ? (
+    <span style={{ color: t.textMuted }}>—</span>
+  ) : (
+    <span
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11.5px] font-medium"
+      style={{
+        background: p.zugelassen === "Ja" ? "#DCFCE7" : "#FEE2E2",
+        color: p.zugelassen === "Ja" ? "#166534" : "#991B1B",
+      }}
+    >
+      {p.zugelassen === "Ja" ? "🟢 Ja" : "🔴 Nein"}
+    </span>
+  )}
 </td>
 
 <td className="px-4 py-2.5">
-  <span
-    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11.5px] font-medium"
-    style={{
-      background: p.hu_au === "Gültig" ? "#DCFCE7" : "#FEE2E2",
-      color: p.hu_au === "Gültig" ? "#166534" : "#991B1B",
-    }}
-  >
-    {p.hu_au === "Gültig" ? "🟢 Gültig" : "🔴 Abgelaufen"}
-  </span>
+  {!p.kennzeichen ? (
+    <span style={{ color: t.textMuted }}>—</span>
+  ) : (
+    <span
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11.5px] font-medium"
+      style={{
+        background: p.hu_au === "Gültig" ? "#DCFCE7" : "#FEE2E2",
+        color: p.hu_au === "Gültig" ? "#166534" : "#991B1B",
+      }}
+    >
+      {p.hu_au === "Gültig" ? "🟢 Gültig" : "🔴 Abgelaufen"}
+    </span>
+  )}
 </td>
-
 <td className="px-4 py-2.5" style={{ color: t.text }}>
-  {p.bereifung || "—"}
+  {!p.kennzeichen ? "—" : (p.bereifung || "—")}
 </td>
                   <td className="px-4 py-2.5">
                     {belegt && tage !== null ? (
@@ -1241,6 +1276,35 @@ function BearbeitenModal({ ctx, platz, onClose, onSave, onLeeren, onLoeschen }) 
       </button>
     ))}
   </div>
+</Feld>
+<Feld t={t} label="Schlüssel">
+  <div className="flex gap-2">
+    {[0, 1, 2].map((wert) => (
+      <button
+        key={wert}
+        type="button"
+        onClick={() => setFeld("schluessel", wert)}
+        className="flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-all hover:shadow-sm hover:-translate-y-0.5"
+        style={{
+          background: form.schluessel === wert ? t.accent : t.panel,
+          color: form.schluessel === wert ? t.accentText : t.text,
+          borderColor: form.schluessel === wert ? t.accent : t.border,
+        }}
+      >
+        {wert} {wert === 1 ? "Schlüssel" : "Schlüssel"}
+      </button>
+    ))}
+  </div>
+</Feld>
+<Feld t={t} label="Notizen">
+  <textarea
+    value={form.notizen || ""}
+    onChange={(e) => setFeld("notizen", e.target.value)}
+    placeholder="Hier können Notizen zum Fahrzeug eingetragen werden..."
+    rows={4}
+    className="w-full border rounded-lg px-3 py-2 text-[13px] outline-none resize-none"
+    style={inputStyle}
+  />
 </Feld>
 
             <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: t.borderSoft }}>

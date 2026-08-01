@@ -77,18 +77,20 @@ ipcMain.handle("fahrzeuge-laden", () => {
 ipcMain.handle("fahrzeug-speichern", (_, fahrzeug) => {
   db.prepare(`
     INSERT OR REPLACE INTO fahrzeuge
-(id, kennzeichen, vin, marke, eingangsdatum, zugelassen, hu_au, bereifung, foto)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+(id, kennzeichen, vin, marke, eingangsdatum, zugelassen, hu_au, bereifung, schluessel, notizen, foto)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
   fahrzeug.id,
-  fahrzeug.kennzeichen,
-  fahrzeug.vin,
-  fahrzeug.marke,
-  fahrzeug.eingangsdatum,
-  fahrzeug.zugelassen,
-  fahrzeug.hu_au,
-  fahrzeug.bereifung,
-  fahrzeug.foto
+fahrzeug.kennzeichen,
+fahrzeug.vin,
+fahrzeug.marke,
+fahrzeug.eingangsdatum,
+fahrzeug.zugelassen,
+fahrzeug.hu_au,
+fahrzeug.bereifung,
+fahrzeug.schluessel,
+fahrzeug.notizen,
+fahrzeug.foto
 );
 
   return true;

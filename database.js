@@ -15,7 +15,9 @@ CREATE TABLE IF NOT EXISTS fahrzeuge (
     eingangsdatum TEXT,
     zugelassen TEXT,
     hu_au TEXT,
-    bereifung TEXT
+    bereifung TEXT,
+schluessel INTEGER DEFAULT 0,
+notizen TEXT
 );
 `);
 try {
@@ -48,6 +50,23 @@ try {
   db.exec(`
     ALTER TABLE fahrzeuge
     ADD COLUMN bereifung TEXT;
+  `);
+} catch {
+  // Spalte existiert bereits
+}
+try {
+  db.exec(`
+    ALTER TABLE fahrzeuge
+    ADD COLUMN schluessel INTEGER DEFAULT 0;
+  `);
+} catch {
+  // Spalte existiert bereits
+}
+
+try {
+  db.exec(`
+    ALTER TABLE fahrzeuge
+    ADD COLUMN notizen TEXT;
   `);
 } catch {
   // Spalte existiert bereits
