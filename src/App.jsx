@@ -26,7 +26,7 @@ import {
    Fahrzeugübersicht — Fuhrpark-Verwaltung
    Seitenleiste + Hell/Dunkel-Modus, ruhige Fachanwendungs-Optik.
 --------------------------------------------------------- */
-
+const VERSION = "1.1";
 const SCHWELLE_GELB = 14;
 const SCHWELLE_ORANGE = 21;
 const SCHWELLE_ROT = 30;
@@ -423,9 +423,67 @@ const plaetze = erzeugeStellplaetze(maxId);
         Informationen
       </div>
 
-      <p style={{ color: t.text }}>
-        Version 1.0
-      </p>
+      <div className="space-y-4">
+
+  <div className="flex justify-between">
+    <span style={{ color: t.textMuted }}>Version</span>
+    <span
+      className="px-2 py-0.5 rounded-full text-[12px] font-medium"
+      style={{
+        background: "#DCFCE7",
+        color: "#166534",
+      }}
+    >
+      {VERSION} · ✅ Aktuell
+    </span>
+  </div>
+
+  <div className="flex justify-between">
+    <span style={{ color: t.textMuted }}>Entwickler</span>
+    <span style={{ color: t.text }}>
+      Kevin Dollmayer
+    </span>
+  </div>
+
+  <div className="flex justify-between">
+    <span style={{ color: t.textMuted }}>Copyright</span>
+    <span style={{ color: t.text }}>
+      © 2026 Kevin Dollmayer
+    </span>
+  </div>
+
+  <div style={{ color: t.textMuted, fontSize: 13 }}>
+    Alle Rechte vorbehalten.
+  </div>
+
+  <button
+    onClick={() =>
+      window.open(
+        "mailto:Kevin.Dollmayer@gmx.de?subject=Feedback Fahrzeugverwaltung&body=Hallo Kevin,%0D%0A%0D%0AIch habe folgendes Feedback:%0D%0A%0D%0A%0D%0A-------------------------%0D%0A%0D%0AVersion: 1.1"
+      )
+    }
+    className="h-10 px-4 rounded-lg border text-sm font-medium transition-all hover:shadow-sm hover:-translate-y-0.5"
+    style={{
+      borderColor: t.border,
+      background: t.panel,
+      color: t.text,
+    }}
+  >
+    ✉️ Feedback senden
+  </button>
+
+  <div
+    style={{
+      color: t.textFaint,
+      fontSize: 12,
+    }}
+  >
+    Vielen Dank für Ihr Feedback.
+    <br />
+    Es hilft dabei, die Fahrzeugverwaltung kontinuierlich zu verbessern.
+  </div>
+
+</div>
     </div>
   </div>
 )}
@@ -529,7 +587,7 @@ function Sidebar({ t, ansicht, setAnsicht, modus, setModus }) {
             />
           </span>
         </button>
-        <div className="px-3 text-[11px]" style={{ color: t.textFaint }}>Version 1.0</div>
+        <div className="px-3 text-[11px]" style={{ color: t.textFaint }}>Version {VERSION}</div>
       </div>
     </aside>
   );
